@@ -1,5 +1,6 @@
-import { error, redirect, type RequestEvent } from '@sveltejs/kit';
-import { UnauthenticatedError } from '#lib/shared/errors/app-error.ts';
+import { error, redirect, type ActionFailure, type RequestEvent } from '@sveltejs/kit';
+import { toActionFailure, type FormFailure } from '#lib/server/http/action-failure.ts';
+import { AppError, UnauthenticatedError } from '#lib/shared/errors/app-error.ts';
 import { loginPathFor } from '#lib/shared/security/safe-redirect.ts';
 import { satisfies, type PermissionRequirement } from '../domain/principal';
 import type { AuthenticatedSession } from '../domain/session';
@@ -55,3 +56,31 @@ export async function withSession<Result>(
 		throw caught;
 	}
 }
+
+/**
+ * Variante de `withSession` para acciones de formulario: los errores tipados (validación,
+ * reglas de negocio, conflictos, API no disponible...) se devuelven como `ActionFailure` para
+ * mostrarlos junto al formulario, con `values` para volver a rellenarlo. El resto de errores
+ * (defectos) se propagan al `handleError` central.
+ *
+ * El resultado es discriminado (`ok`) para que el llamador decida qué hacer con cada caso
+ * (p. ej. redirigir tras crear) sin volver a capturar errores.
+ */
+export async function withSessionAction<Result>(
+	event: RequestEvent,
+	operation: (session: AuthenticatedSession) => Promise<Result>,
+	values: Readonly<Record<string, string>> = {}
+): Promise<ActionOutcome<Result>> {
+	try {
+		return { ok: true, value: await withSession(event, operation) };
+	} catch (caught) {
+		if (caught instanceof AppError) {
+			return { ok: false, failure: toActionFailure(caught, values) };
+		}
+		throw caught;
+	}
+}
+
+export type ActionOutcome<Result> =
+	| { readonly ok: true; readonly value: Result }
+	| { readonly ok: false; readonly failure: ActionFailure<FormFailure> };

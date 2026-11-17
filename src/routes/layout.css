@@ -1,3 +1,233 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+/*
+ * Design tokens (ver SYSTEM-DESIGN.md). Los colores son semánticos (superficie, etiqueta,
+ * separador...) y no literales: cada tema redefine el valor y los componentes no cambian.
+ * Toda pantalla consume estos tokens a través de las utilidades de Tailwind (`bg-surface`,
+ * `text-label-secondary`, `border-separator`...) o de las clases de componente de abajo.
+ */
+:root {
+	color-scheme: light dark;
+
+	--background: #f5f5f7;
+	--surface: #ffffff;
+	--surface-raised: #ffffff;
+	--fill: rgb(120 120 128 / 0.08);
+	--fill-strong: rgb(120 120 128 / 0.16);
+	--separator: rgb(60 60 67 / 0.12);
+	--separator-strong: rgb(60 60 67 / 0.26);
+
+	/* Contraste sobre `--surface` y `--background`: label ≥ 15:1, secondary ≥ 4.6:1 (AA). */
+	--label: #1d1d1f;
+	--label-secondary: #6e6e73;
+	--label-tertiary: #8e8e93;
+
+	--accent: #0066cc;
+	--accent-hover: #0071e3;
+	--accent-pressed: #005bb5;
+	--accent-fill: rgb(0 102 204 / 0.1);
+	--on-accent: #ffffff;
+
+	--success: #1b7a35;
+	--success-fill: rgb(52 199 89 / 0.14);
+	--warning: #9a5200;
+	--warning-fill: rgb(255 149 0 / 0.16);
+	--danger: #c4001a;
+	--danger-fill: rgb(255 59 48 / 0.12);
+
+	--focus-ring: rgb(0 102 204 / 0.45);
+	--shadow-popover: 0 8px 28px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background: #111113;
+		--surface: #1c1c1e;
+		--surface-raised: #2c2c2e;
+		--fill: rgb(120 120 128 / 0.18);
+		--fill-strong: rgb(120 120 128 / 0.3);
+		--separator: rgb(84 84 88 / 0.5);
+		--separator-strong: rgb(120 120 128 / 0.55);
+
+		--label: #f5f5f7;
+		--label-secondary: #a1a1a6;
+		--label-tertiary: #7c7c80;
+
+		--accent: #2997ff;
+		--accent-hover: #47a6ff;
+		--accent-pressed: #1a85eb;
+		--accent-fill: rgb(41 151 255 / 0.18);
+		--on-accent: #ffffff;
+
+		--success: #32d74b;
+		--success-fill: rgb(50 215 75 / 0.16);
+		--warning: #ffb340;
+		--warning-fill: rgb(255 179 64 / 0.16);
+		--danger: #ff6961;
+		--danger-fill: rgb(255 105 97 / 0.16);
+
+		--focus-ring: rgb(41 151 255 / 0.55);
+		--shadow-popover: 0 8px 28px rgb(0 0 0 / 0.5), 0 0 0 0.5px rgb(255 255 255 / 0.12);
+	}
+}
+
+@theme inline {
+	--font-sans:
+		-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, Roboto,
+		'Helvetica Neue', sans-serif;
+
+	--color-background: var(--background);
+	--color-surface: var(--surface);
+	--color-surface-raised: var(--surface-raised);
+	--color-fill: var(--fill);
+	--color-fill-strong: var(--fill-strong);
+	--color-separator: var(--separator);
+	--color-separator-strong: var(--separator-strong);
+	--color-label: var(--label);
+	--color-label-secondary: var(--label-secondary);
+	--color-label-tertiary: var(--label-tertiary);
+	--color-accent: var(--accent);
+	--color-accent-hover: var(--accent-hover);
+	--color-accent-pressed: var(--accent-pressed);
+	--color-accent-fill: var(--accent-fill);
+	--color-on-accent: var(--on-accent);
+	--color-success: var(--success);
+	--color-success-fill: var(--success-fill);
+	--color-warning: var(--warning);
+	--color-warning-fill: var(--warning-fill);
+	--color-danger: var(--danger);
+	--color-danger-fill: var(--danger-fill);
+	--color-focus-ring: var(--focus-ring);
+
+	--radius-control: 0.5rem;
+	--radius-panel: 0.75rem;
+	--shadow-popover: var(--shadow-popover);
+}
+
+@layer base {
+	html {
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		font-feature-settings: 'tnum' 0;
+	}
+
+	body {
+		@apply bg-background font-sans text-label;
+	}
+
+	:focus-visible {
+		outline: 3px solid var(--focus-ring);
+		outline-offset: 1px;
+	}
+}
+
+/* Base de los botones: 36 px de alto (40 px en pantallas táctiles pequeñas). */
+@utility btn {
+	@apply inline-flex h-10 items-center justify-center gap-1.5 rounded-control px-4 text-sm font-medium whitespace-nowrap transition-colors duration-150 select-none sm:h-9 sm:px-3.5;
+	@apply disabled:cursor-not-allowed disabled:opacity-45;
+}
+
+/*
+ * Clases de componente: el único sitio donde se define el aspecto de controles y superficies.
+ * Las pantallas las combinan, nunca redefinen colores, radios o alturas por su cuenta.
+ */
+@layer components {
+	/* Tipografía: escala corta y contenida, la jerarquía la marcan peso y color. */
+	.text-title {
+		@apply text-[1.625rem] leading-tight font-semibold tracking-tight;
+	}
+
+	.text-headline {
+		@apply text-[1.0625rem] leading-snug font-semibold;
+	}
+
+	.text-caption {
+		@apply text-xs text-label-secondary;
+	}
+
+	.btn-primary {
+		@apply btn bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-pressed;
+	}
+
+	.btn-secondary {
+		@apply btn border border-separator-strong bg-surface text-label hover:bg-fill active:bg-fill-strong;
+	}
+
+	.btn-plain {
+		@apply btn text-accent hover:bg-accent-fill;
+	}
+
+	.btn-danger {
+		@apply btn border border-separator-strong bg-surface text-danger hover:bg-danger-fill;
+	}
+
+	.btn-danger-filled {
+		@apply btn bg-danger text-white hover:opacity-90 active:opacity-80;
+	}
+
+	.btn-icon {
+		@apply inline-flex size-9 items-center justify-center rounded-control text-label-secondary transition-colors hover:bg-fill hover:text-label;
+	}
+
+	/* Campos de formulario. */
+	.field-label {
+		@apply block text-sm font-medium text-label;
+	}
+
+	.field-hint {
+		@apply mt-1 text-xs text-label-secondary;
+	}
+
+	.field-input {
+		@apply block w-full rounded-control border border-separator-strong bg-surface px-3 py-2 text-sm text-label shadow-none placeholder:text-label-tertiary;
+		@apply transition-[border-color,box-shadow] duration-150 focus:border-accent focus:ring-3 focus:ring-focus-ring focus:outline-none;
+		@apply disabled:bg-fill disabled:text-label-secondary;
+		@apply aria-invalid:border-danger aria-invalid:focus:ring-danger-fill;
+	}
+
+	.field-checkbox {
+		@apply size-4 rounded border-separator-strong bg-surface text-accent focus:ring-focus-ring;
+	}
+
+	/* Superficies: una sola elevación, con borde fino en lugar de sombra. */
+	.panel {
+		@apply rounded-panel border border-separator bg-surface;
+	}
+
+	/* Tablas de datos al estilo Finder: cabecera discreta, filas separadas por líneas finas. */
+	.data-table {
+		@apply w-full text-left text-sm;
+	}
+
+	.data-table th {
+		@apply border-b border-separator px-4 py-2.5 text-xs font-medium whitespace-nowrap text-label-secondary;
+	}
+
+	.data-table td {
+		@apply border-b border-separator px-4 py-3 align-middle;
+	}
+
+	.data-table tbody tr:last-child td {
+		@apply border-b-0;
+	}
+
+	.data-table tbody tr {
+		@apply transition-colors duration-100 hover:bg-fill;
+	}
+
+	.numeric {
+		@apply text-right whitespace-nowrap tabular-nums;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+	}
+}

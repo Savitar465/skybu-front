@@ -73,7 +73,15 @@ export function problemToAppError(status: number, rawBody: unknown): AppError {
 function toFieldErrors(violations: ProblemDetails['errors']): FieldErrors {
 	const fieldErrors: Record<string, string[]> = {};
 	for (const violation of violations ?? []) {
-		(fieldErrors[violation.field] ??= []).push(violation.message);
+		(fieldErrors[toFieldPath(violation.field)] ??= []).push(violation.message);
 	}
 	return fieldErrors;
+}
+
+/**
+ * Bean Validation nombra los elementos de una lista como `lines[0].quantity`; la validación del
+ * frontend (Zod) como `lines.0.quantity`. Se unifica para que la UI busque un único nombre.
+ */
+function toFieldPath(field: string): string {
+	return field.replace(/\[(\d+)]/g, '.$1');
 }

@@ -5,6 +5,7 @@
 		NEW_PASSWORD_MIN_LENGTH
 	} from '#lib/modules/auth/application/dto/change-password-input.ts';
 	import FieldError from '#lib/shared/ui/FieldError.svelte';
+	import Notice from '#lib/shared/ui/Notice.svelte';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
@@ -51,18 +52,18 @@
 </svelte:head>
 
 <div class="max-w-md">
-	<h1 class="text-2xl font-semibold text-slate-900">Cambiar contraseña</h1>
-	<p class="mt-1 text-sm text-slate-500">
+	<h1 class="text-title text-label">Cambiar contraseña</h1>
+	<p class="mt-1 text-sm text-label-secondary">
 		Mínimo {NEW_PASSWORD_MIN_LENGTH} caracteres. Al cambiarla se cerrarán tus sesiones en todos los dispositivos.
 	</p>
 
 	{#if formMessage}
-		<p class="mt-6 rounded-md bg-red-50 p-3 text-sm text-red-700" role="alert">{formMessage}</p>
+		<Notice tone="error" message={formMessage} class="mt-6" />
 	{/if}
 
 	<form
 		method="POST"
-		class="mt-6 space-y-4"
+		class="panel mt-6 space-y-5 p-5 sm:p-6"
 		novalidate
 		use:enhance={() => {
 			submitting = true;
@@ -74,9 +75,7 @@
 	>
 		{#each fields as field (field.name)}
 			<div>
-				<label for={field.name} class="block text-sm font-medium text-slate-700"
-					>{field.label}</label
-				>
+				<label for={field.name} class="field-label">{field.label}</label>
 				<input
 					id={field.name}
 					name={field.name}
@@ -86,17 +85,13 @@
 					maxlength={field.maxlength}
 					aria-invalid={fieldErrors[field.name] ? 'true' : undefined}
 					aria-describedby={fieldErrors[field.name] ? `${field.name}-error` : undefined}
-					class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+					class="field-input mt-1.5"
 				/>
 				<FieldError id="{field.name}-error" messages={fieldErrors[field.name]} />
 			</div>
 		{/each}
 
-		<button
-			type="submit"
-			disabled={submitting}
-			class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-		>
+		<button type="submit" disabled={submitting} class="btn-primary">
 			{submitting ? 'Guardando…' : 'Cambiar contraseña'}
 		</button>
 	</form>

@@ -7,15 +7,13 @@
 	<title>Error {page.status} · SkyBu</title>
 </svelte:head>
 
-<main class="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+<main class="flex min-h-dvh items-center justify-center px-4">
 	<div class="max-w-md text-center">
-		<p class="text-sm font-semibold text-slate-500">Error {page.status}</p>
-		<h1 class="mt-2 text-2xl font-semibold text-slate-900">{page.error?.message}</h1>
+		<p class="text-sm font-medium text-label-secondary">Error {page.status}</p>
+		<h1 class="text-title mt-2 text-label">{page.error?.message}</h1>
 		{#if page.error?.errorId}
-			<p class="mt-2 text-xs text-slate-400">Referencia: {page.error.errorId}</p>
+			<p class="text-caption mt-2">Referencia: {page.error.errorId}</p>
 		{/if}
-		<a href={resolve('/(app)')} class="mt-6 inline-block text-blue-600 hover:underline"
-			>Volver al inicio</a
-		>
+		<a href={resolve('/(app)')} class="btn-secondary mt-6">Volver al inicio</a>
 	</div>
 </main>

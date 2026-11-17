@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import FieldError from '#lib/shared/ui/FieldError.svelte';
+	import Notice from '#lib/shared/ui/Notice.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -17,24 +18,22 @@
 	<title>Iniciar sesión · SkyBu</title>
 </svelte:head>
 
-<main class="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-	<div class="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-		<h1 class="text-2xl font-semibold text-slate-900">Iniciar sesión</h1>
-		<p class="mt-1 text-sm text-slate-500">Accede a tu empresa en SkyBu.</p>
+<main class="flex min-h-dvh items-center justify-center px-4">
+	<div class="panel w-full max-w-sm p-8">
+		<h1 class="text-title text-label">Iniciar sesión</h1>
+		<p class="mt-1 text-sm text-label-secondary">Accede a tu empresa en SkyBu.</p>
 
 		{#if data.notice && !form}
-			<p class="mt-6 rounded-md bg-blue-50 p-3 text-sm text-blue-800" role="status">
-				{data.notice}
-			</p>
+			<Notice tone="info" message={data.notice} class="mt-6" />
 		{/if}
 
 		{#if formMessage}
-			<p class="mt-6 rounded-md bg-red-50 p-3 text-sm text-red-700" role="alert">{formMessage}</p>
+			<Notice tone="error" message={formMessage} class="mt-6" />
 		{/if}
 
 		<form
 			method="POST"
-			class="mt-6 space-y-4"
+			class="mt-6 space-y-5"
 			novalidate
 			use:enhance={() => {
 				submitting = true;
@@ -46,9 +45,7 @@
 			}}
 		>
 			<div>
-				<label for="email" class="block text-sm font-medium text-slate-700"
-					>Correo electrónico</label
-				>
+				<label for="email" class="field-label">Correo electrónico</label>
 				<input
 					id="email"
 					name="email"
@@ -59,13 +56,13 @@
 					value={form?.values.email ?? ''}
 					aria-invalid={fieldErrors.email ? 'true' : undefined}
 					aria-describedby={fieldErrors.email ? 'email-error' : undefined}
-					class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+					class="field-input mt-1.5"
 				/>
 				<FieldError id="email-error" messages={fieldErrors.email} />
 			</div>
 
 			<div>
-				<label for="password" class="block text-sm font-medium text-slate-700">Contraseña</label>
+				<label for="password" class="field-label">Contraseña</label>
 				<input
 					id="password"
 					name="password"
@@ -75,16 +72,12 @@
 					maxlength="128"
 					aria-invalid={fieldErrors.password ? 'true' : undefined}
 					aria-describedby={fieldErrors.password ? 'password-error' : undefined}
-					class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+					class="field-input mt-1.5"
 				/>
 				<FieldError id="password-error" messages={fieldErrors.password} />
 			</div>
 
-			<button
-				type="submit"
-				disabled={submitting}
-				class="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-			>
+			<button type="submit" disabled={submitting} class="btn-primary w-full">
 				{submitting ? 'Entrando…' : 'Entrar'}
 			</button>
 		</form>

@@ -9,7 +9,7 @@
 </script>
 
 {#if messages.length > 0}
-	<ul {id} class="mt-1 space-y-0.5 text-sm text-red-600">
+	<ul {id} class="mt-1.5 space-y-0.5 text-sm text-danger">
 		{#each messages as message (message)}
 			<li>{message}</li>
 		{/each}

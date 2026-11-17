@@ -11,6 +11,25 @@ export interface FormFailure {
 }
 
 /**
+ * Valores de texto de un formulario para volver a rellenarlo tras un error. Solo se copian los
+ * campos indicados (nunca contraseñas ni otros secretos) y recortados a una longitud razonable.
+ */
+export function formValues(
+	formData: FormData,
+	fields: readonly string[]
+): Readonly<Record<string, string>> {
+	const MAX_VALUE_LENGTH = 2000;
+	const values: Record<string, string> = {};
+	for (const field of fields) {
+		const value = formData.get(field);
+		if (typeof value === 'string') {
+			values[field] = value.slice(0, MAX_VALUE_LENGTH);
+		}
+	}
+	return values;
+}
+
+/**
  * Convierte un `AppError` en un `ActionFailure` que la página puede mostrar junto al formulario.
  * Solo se usa con errores ya tipados; cualquier otro error debe propagarse al `handleError`
  * central (no se silencia ni se convierte en un mensaje genérico aquí).

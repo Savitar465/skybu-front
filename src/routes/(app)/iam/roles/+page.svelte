@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { Permissions } from '#lib/modules/auth/domain/permissions.ts';
 	import Can from '#lib/modules/auth/presentation/Can.svelte';
+	import Badge from '#lib/shared/ui/Badge.svelte';
+	import EmptyState from '#lib/shared/ui/EmptyState.svelte';
+	import PageHeader from '#lib/shared/ui/PageHeader.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -10,35 +13,36 @@
 	<title>Roles · SkyBu</title>
 </svelte:head>
 
-<div class="flex items-center justify-between">
-	<h1 class="text-2xl font-semibold text-slate-900">Roles</h1>
-	<Can requirement={Permissions.iam.rolesManage}>
-		<span class="rounded-md bg-blue-50 px-3 py-1.5 text-sm text-blue-700"
-			>Puedes gestionar roles</span
-		>
-		{#snippet fallback()}
-			<span class="rounded-md bg-slate-100 px-3 py-1.5 text-sm text-slate-600">Solo lectura</span>
-		{/snippet}
-	</Can>
-</div>
+<PageHeader title="Roles" subtitle="Conjuntos de permisos que se asignan a los usuarios.">
+	{#snippet titleAccessory()}
+		<Can requirement={Permissions.iam.rolesManage}>
+			<Badge tone="accent" label="Puedes gestionar roles" />
+			{#snippet fallback()}
+				<Badge label="Solo lectura" />
+			{/snippet}
+		</Can>
+	{/snippet}
+</PageHeader>
 
-{#if data.roles.length === 0}
-	<p class="mt-6 text-slate-500">Tu empresa todavía no tiene roles.</p>
-{:else}
-	<ul class="mt-6 divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
-		{#each data.roles as role (role.id)}
-			<li class="p-4">
-				<div class="flex items-center gap-2">
-					<h2 class="font-medium text-slate-900">{role.name}</h2>
-					{#if role.systemRole}
-						<span class="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">Sistema</span>
+<section class="panel overflow-hidden" aria-label="Roles">
+	{#if data.roles.length === 0}
+		<EmptyState icon="shield" title="Tu empresa todavía no tiene roles." />
+	{:else}
+		<ul class="divide-y divide-separator">
+			{#each data.roles as role (role.id)}
+				<li class="px-5 py-4">
+					<div class="flex items-center gap-2">
+						<h2 class="font-medium text-label">{role.name}</h2>
+						{#if role.systemRole}
+							<Badge label="Sistema" />
+						{/if}
+					</div>
+					{#if role.description}
+						<p class="mt-1 text-sm text-label-secondary">{role.description}</p>
 					{/if}
-				</div>
-				{#if role.description}
-					<p class="mt-1 text-sm text-slate-500">{role.description}</p>
-				{/if}
-				<p class="mt-2 text-xs text-slate-400">{role.permissions.length} permisos</p>
-			</li>
-		{/each}
-	</ul>
-{/if}
+					<p class="text-caption mt-2">{role.permissions.length} permisos</p>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+</section>
